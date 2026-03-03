@@ -1,0 +1,22 @@
+<!-- templates/tasks/partials/task_list.html -->
+{% load custom_filters %}
+
+{% for task in tasks %}
+<div class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+        <h6 class="mb-1">{{ task.name }}</h6>
+        <small>{{ task.created_at|timesince }} ago</small>
+    </div>
+    <p class="mb-1 small text-muted">{{ task.description|truncatewords:10 }}</p>
+    <small>
+        <span class="badge bg-{{ task.status|status_color }}">
+            {{ task.get_status_display }}
+        </span>
+        • Due: {{ task.end_date|date:"M d" }}
+    </small>
+</div>
+{% empty %}
+<div class="text-center text-muted py-4">
+    No tasks found.
+</div>
+{% endfor %}

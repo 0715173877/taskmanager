@@ -1,0 +1,145 @@
+<!-- templates/tasks/overview.html -->
+{% extends 'base.html' %}
+
+{% block title %}Task Overview{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>Task Overview</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Overview</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Tasks</h5>
+                <h2 class="display-6">{{ total_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Completed</h5>
+                <h2 class="display-6">{{ completed_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Overdue</h5>
+                <h2 class="display-6">{{ overdue_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Completion Rate</h5>
+                <h2 class="display-6">{{ completion_rate|floatformat:1 }}%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if is_manager and staff_tasks %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Staff Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Total Tasks</th>
+                                <th>Completed</th>
+                                <th>In Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_tasks %}
+                            <tr>
+                                <td>{{ staff.assigned_to__username }}</td>
+                                <td>{{ staff.total }}</td>
+                                <td>{{ staff.completed }}</td>
+                                <td>{{ staff.in_progress }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Tasks</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for task in recent_tasks %}
+                    <a href="{% url 'tasks:task_detail' task.id %}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ task.name }}</h6>
+                            <small>{{ task.created_at|timesince }} ago</small>
+                        </div>
+                        <p class="mb-1 small text-muted">{{ task.description|truncatewords:20 }}</p>
+                        <small>
+                            <span class="badge bg-{{ task.status|status_color }}">
+                                {{ task.get_status_display }}
+                            </span>
+                            • Assigned to: {{ task.assigned_to.get_full_name|default:task.assigned_to.username }}
+                        </small>
+                    </a>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        No recent tasks
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'tasks:create_task' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create New Task
+                    </a>
+                    <a href="{% url 'tasks:filter_tasks' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-funnel"></i> Filter Tasks
+                    </a>
+                    {% if is_manager %}
+                    <a href="{% url 'tasks:reports' %}" class="btn btn-outline-info">
+                        <i class="bi bi-graph-up"></i> View Reports
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

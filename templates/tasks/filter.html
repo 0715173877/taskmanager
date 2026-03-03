@@ -1,0 +1,54 @@
+<!-- templates/tasks/filter.html -->
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+
+{% block title %}Filter Tasks{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Filter Tasks</h4>
+            </div>
+            <div class="card-body">
+                <form method="get" hx-get="{% url 'tasks:filter_tasks' %}" hx-target="#task-results" hx-trigger="change">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select" onchange="this.form.requestSubmit()">
+                                <option value="">All Status</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="needs_extension" {% if status_filter == 'needs_extension' %}selected{% endif %}>Needs Extension</option>
+                                <option value="extension_granted" {% if status_filter == 'extension_granted' %}selected{% endif %}>Extension Granted</option>
+                                <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">From Date</label>
+                            <input type="date" name="date_from" class="form-control" 
+                                   value="{{ date_from }}" onchange="this.form.requestSubmit()">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">To Date</label>
+                            <input type="date" name="date_to" class="form-control" 
+                                   value="{{ date_to }}" onchange="this.form.requestSubmit()">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div id="task-results">
+            {% include 'tasks/partials/task_table.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

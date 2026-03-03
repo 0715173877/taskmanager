@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Notifications</h2>
+            <div>
+                <button class="btn btn-outline-primary" onclick="markAllNotificationsRead()">
+                    <i class="bi bi-check-all"></i> Mark All as Read
+                </button>
+                <button class="btn btn-outline-secondary" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <p class="text-muted">Your recent notifications</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="notifications-list" hx-get="{% url 'tasks:notifications' %}" hx-trigger="load">
+                    <!-- Notifications will be loaded here -->
+                    <div class="text-center p-5">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading notifications...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function markAllNotificationsRead() {
+    if (confirm('Mark all notifications as read?')) {
+        htmx.ajax('POST', '{% url "tasks:mark_all_notifications_read" %}', '#notifications-list')
+            .then(() => {
+                // Update badge count
+                updateNotificationCount();
+            });
+    }
+}
+
+// Auto-refresh every 60 seconds
+setTimeout(() => {
+    htmx.ajax('GET', '{% url "tasks:notifications" %}', '#notifications-list');
+}, 60000);
+</script>
+{% endblock %}

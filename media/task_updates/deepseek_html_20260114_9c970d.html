@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Task Manager{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dashboard</h2>
+    <a href="{% url 'task_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Create Task
+    </a>
+</div>
+
+{% if user.is_manager %}
+<!-- Manager Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary">{{ total_tasks }}</h1>
+                <p class="card-text">Total Tasks</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-success">{{ completed_tasks }}</h1>
+                <p class="card-text">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-warning">{{ pending_tasks }}</h1>
+                <p class="card-text">Pending</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-info">{{ total_staff }}</h1>
+                <p class="card-text">Staff Members</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Recent Tasks</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_tasks %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in recent_tasks %}
+                    <tr>
+                        <td>{{ task.title|truncatechars:30 }}</td>
+                        <td>{{ task.assigned_to.get_full_name }}</td>
+                        <td>
+                            <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'pending' %}warning{% else %}primary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ task.due_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'task_detail' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+            <p class="text-muted">No tasks yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% else %}
+<!-- Staff Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary">{{ my_tasks.count }}</h1>
+                <p class="card-text">My Tasks</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-success">{{ completed_tasks }}</h1>
+                <p class="card-text">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-warning">{{ pending_tasks }}</h1>
+                <p class="card-text">Pending</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <h1 class="display-4 text-danger">{{ overdue_tasks }}</h1>
+                <p class="card-text">Overdue</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">My Recent Tasks</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_tasks %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th>Days Left</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in recent_tasks %}
+                    <tr>
+                        <td>{{ task.title|truncatechars:30 }}</td>
+                        <td>
+                            <span class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'pending' %}warning{% else %}primary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ task.due_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if task.days_remaining == 0 and not task.is_overdue %}
+                            <span class="badge bg-warning">Today</span>
+                            {% elif task.is_overdue %}
+                            <span class="badge bg-danger">Overdue</span>
+                            {% else %}
+                            <span class="badge bg-info">{{ task.days_remaining }} days</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'task_detail' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+            <p class="text-muted">No tasks assigned to you</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,131 @@
+<!-- templates/tasks/reports.html -->
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Reports - Task Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>Reports</h2>
+        <p class="text-muted">Task management analytics and insights</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Summary Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Tasks</h5>
+                <h2 class="display-6">{{ total_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Completed</h5>
+                <h2 class="display-6">{{ completed_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <h5 class="card-title">Overdue</h5>
+                <h2 class="display-6">{{ overdue_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Completion Rate</h5>
+                <h2 class="display-6">{{ completion_rate|floatformat:1 }}%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Performance -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Staff Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Total Tasks</th>
+                                <th>Completed</th>
+                                <th>Overdue</th>
+                                <th>Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_performance %}
+                            <tr>
+                                <td>{{ staff.get_full_name|default:staff.username }}</td>
+                                <td>{{ staff.total_tasks }}</td>
+                                <td>{{ staff.completed_tasks }}</td>
+                                <td>
+                                    {% if staff.overdue_tasks > 0 %}
+                                    <span class="badge bg-danger">{{ staff.overdue_tasks }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if staff.total_tasks > 0 %}
+                                    <span class="badge bg-{% if staff.completed_tasks|divisibleby:staff.total_tasks > 0.7 %}success{% else %}warning{% endif %}">
+                                        {{ staff.completed_tasks|divisibleby:staff.total_tasks|floatformat:1 }}%
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    No staff performance data available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'tasks:dashboard' %}" class="btn btn-primary">
+                        <i class="bi bi-speedometer2"></i> Go to Dashboard
+                    </a>
+                    <a href="{% url 'tasks:filter_tasks' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-funnel"></i> Filter Tasks
+                    </a>
+                    <a href="{% url 'tasks:create_task' %}" class="btn btn-outline-success">
+                        <i class="bi bi-plus-circle"></i> Create New Task
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

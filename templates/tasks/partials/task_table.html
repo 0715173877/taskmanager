@@ -1,0 +1,61 @@
+<!-- templates/tasks/partials/task_table.html -->
+{% load custom_filters %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            {% if filtered %}
+                Filtered Tasks ({{ tasks.count }})
+            {% else %}
+                All Tasks ({{ tasks.count }})
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Assigned To</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.name }}</td>
+                        <td>{{ task.assigned_to.get_full_name|default:task.assigned_to.username }}</td>
+                        <td>{{ task.start_date|date:"M d, Y" }}</td>
+                        <td>
+                            {{ task.end_date|date:"M d, Y" }}
+                            {% if task.is_overdue %}
+                            <span class="badge bg-danger">Overdue</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ task.status|status_color }}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No tasks found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+<!-- templates/accounts/logout.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logged Out</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Successfully Logged Out</h1>
+        <p>You have been logged out of your account.</p>
+        <div>
+            <a href="{% url 'accounts:login' %}" class="btn">Login Again</a>
+            <a href="/" class="btn" style="background: #6c757d;">Go to Home</a>
+        </div>
+    </div>
+</body>
+</html>

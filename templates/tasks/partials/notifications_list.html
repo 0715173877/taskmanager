@@ -1,0 +1,8 @@
+{% for notification in notifications %}
+    {% include 'tasks/partials/notification_item.html' with notification=notification %}
+{% empty %}
+    <div class="text-center p-3 text-muted">
+        <i class="bi bi-bell-slash display-6"></i>
+        <p class="mt-2 mb-0">No notifications</p>
+    </div>
+{% endfor %}
